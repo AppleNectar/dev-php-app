@@ -1,0 +1,75 @@
+version: "3"
+
+volumes:
+  mysql-data:
+    driver: local
+
+services:
+  nginx.local:
+    build:
+      context: ./build/nginx
+      args:
+        WEB_USER_NAME: ${WEB_USER_NAME}
+        WEB_USER_GROUP: ${WEB_USER_GROUP}
+        WEB_USER_UID: ${WEB_USER_UID}
+        WEB_USER_GID: ${WEB_USER_GID}
+    environment:
+      TZ: ${CONTAINERS_TIMEZONE}
+    ports:
+      - ${HTTP_PORT}:80
+      - ${HTTPS_PORT}:443
+    volumes:
+      - ./app:/home/${WEB_USER_NAME}/public_html
+      # - ./container-conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      # - ./container-conf/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+
+  php.local:
+    build:
+      context: ./build/php
+      args:
+        WEB_USER_NAME: ${WEB_USER_NAME}
+        WEB_USER_GROUP: ${WEB_USER_GROUP}
+        WEB_USER_UID: ${WEB_USER_UID}
+        WEB_USER_GID: ${WEB_USER_GID}
+        PHP_NODE_ENABLE: ${PHP_NODE_ENABLE}
+        NODE_VERSION: ${NODE_VERSION}
+    environment:
+      TZ: ${CONTAINERS_TIMEZONE}
+    ports:
+      - ${FPM_PORT}:9000
+      - ${XDEBUG_PORT}:9001
+    volumes:
+      - ./app:/home/${WEB_USER_NAME}/public_html
+      # - ./container-conf/php/php.ini:/usr/local/etc/php/php.ini
+      # - ./container-conf/php/php-fpm.d/zzz-www.conf:/usr/local/etc/php-fpm.d/zzz-www.conf
+      # - ./container-conf/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      # - ./container-conf/php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+  mysql.local:
+    build:
+      context: ./build/maria
+    environment:
+      TZ: ${CONTAINERS_TIMEZONE}
+      MYSQL_DATA_PATH: ${MYSQL_DATA_PATH}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DEFAULT_DB: ${MYSQL_DEFAULT_DB}
+    ports:
+      - ${DB_PORT}:3306
+    volumes:
+      - mysql-data:${MYSQL_DATA_PATH}
+      # - ./container-conf/maria/my.cnf.d/mariadb-server.cnf:/etc/my.cnf.d/mariadb-server.cnf
+
+  redis.local:
+    build:
+      context: ./build/redis
+    environment:
+      TZ: ${CONTAINERS_TIMEZONE}
+      REDIS_AUTH_PASS: ${REDIS_AUTH_PASS}
+    ports:
+      - ${IMDB_PORT}:6379
+    sysctls:
+      net.core.somaxconn: 511
+    # volumes:
+      # - ./container-conf/redis/redis.conf:/usr/local/etc/redis/redis.conf

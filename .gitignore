@@ -1,0 +1,4 @@
+.env
+container-conf/
+app/
+build/nginx/conf/certs/*.*
