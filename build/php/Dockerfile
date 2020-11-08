@@ -1,4 +1,6 @@
-FROM php:7.4-fpm-alpine3.12
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-fpm-alpine3.12
 LABEL maintainer="AppleNectar"
 
 ARG WEB_USER_NAME

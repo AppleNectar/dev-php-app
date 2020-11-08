@@ -27,6 +27,7 @@ services:
     build:
       context: ./build/php
       args:
+        PHP_VERSION: ${PHP_VERSION}
         WEB_USER_NAME: ${WEB_USER_NAME}
         WEB_USER_GROUP: ${WEB_USER_GROUP}
         WEB_USER_UID: ${WEB_USER_UID}
