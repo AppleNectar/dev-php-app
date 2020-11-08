@@ -27,8 +27,8 @@ The stack consists of Nginx / php-fpm / MariaDB / Redis, each container is based
 
 - Use the official image of php
 - The execution user has the same user name and user id as Nginx.
-- Listen on port 9000 of TCP
-- Xdebug extension is valid (Listen on port 9001)
+- Listen on port 9001 of TCP
+- Xdebug extension is valid (Listen on port 9000 / Default idekey "IDEKEY")
 - PHP extension that Laravel depends on is installed
 - Composer is installed system-wide
 - php-cs-fixer is installed system wide
