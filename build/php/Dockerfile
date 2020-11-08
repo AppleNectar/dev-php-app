@@ -81,8 +81,7 @@ RUN set -eux \
 
 # Install composer
 RUN set -eux \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && sudo -u web composer config -g repos.packagist composer https://packagist.jp
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install php-cs-fixer
 RUN set -eux \
