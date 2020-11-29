@@ -43,6 +43,7 @@ The stack consists of Nginx / php-fpm / MariaDB / Redis, each container is based
 - The data is persisted by the volume "mysql-data" by the local driver  
    (If you don't like it, specify the host directory as the volume to mount `/var/lib/mysql`)
 - If you want to change mariadb settings, mount any `mariadb-server.cnf` to `/etc/my.cnf.d/mariadb-server.cnf`
+- The time zone follows the time zone setting of the container (i.e. the environment variable "TZ").
 
 ### Redis
 

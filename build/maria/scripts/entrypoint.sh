@@ -1,6 +1,6 @@
 #!/bin/sh
 
-: "MariaDB container entrypoint" && set -eu && {
+: "MariaDB container entrypoint" && set -eux && {
     if [ ! -d "${MYSQL_DATA_PATH}/mysql" ]; then
         # Initialize
         mysql_install_db --user=mysql --datadir=${MYSQL_DATA_PATH}
@@ -17,6 +17,8 @@
         cat ${TEMP_SQL} | mysql -u root --password="${MYSQL_ROOT_PASSWORD}"
         rm ${TEMP_SQL}
         unset TEMP_SQL
+        # Create timezone support tables from zone info
+        mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -D mysql -u root --password="${MYSQL_ROOT_PASSWORD}"
         rc-service mariadb stop
     else
         # If don't start it with service once, it won't create a socket file, so start and stop it (you can create it manually, but...)
