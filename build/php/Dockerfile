@@ -59,7 +59,7 @@ RUN set -eux \
     && sed -i -e "/^user = /s/www-data/${WEB_USER_NAME}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
     && sed -i -e "/^group = /s/www-data/${WEB_USER_GROUP}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
     #&& sed -i -e "/^listen = /s/127.0.0.1:9000/\/var\/run\/php-fpm\/php-fpm.sock/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
-    && sed -i -e "/^listen = /s/127.0.0.1:9000/9001/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
+    && sed -i -e "/^listen = /s/127.0.0.1:9000/9000/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
     && sed -i -e "s/;listen.owner = www-data/listen.owner = ${WEB_USER_NAME}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
     && sed -i -e "s/;listen.owner = www-data/listen.group = ${WEB_USER_GROUP}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
     && sed -i -e "s/;listen.mode/listen.mode/g" /usr/local/etc/php-fpm.d/zzz-www.conf

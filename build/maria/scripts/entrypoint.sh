@@ -9,7 +9,7 @@
         # Generate and execute SQL to change root password and create users, delete default user and test database
         TEMP_SQL=/tmp/maria_init.sql
         mysqladmin -u root password "${MYSQL_ROOT_PASSWORD}"
-        echo "CREATE DATABASE IF NOT EXISTS ${MYSQL_DEFAULT_DB} DEFAULT CHARACTER SET utf8mb4;"  >> ${TEMP_SQL}
+        echo "CREATE DATABASE IF NOT EXISTS ${MYSQL_DEFAULT_DB} DEFAULT CHARACTER SET utf8mb4;" >> ${TEMP_SQL}
         echo "GRANT ALL PRIVILEGES ON ${MYSQL_DEFAULT_DB}.* TO ${MYSQL_USER}@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION;" >> ${TEMP_SQL}
         echo "DELETE FROM mysql.user WHERE User='';" >> ${TEMP_SQL}
         echo "DROP DATABASE test;" >> ${TEMP_SQL}

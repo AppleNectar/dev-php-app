@@ -38,8 +38,6 @@ services:
         NODE_VERSION: ${NODE_VERSION}
     environment:
       TZ: ${CONTAINERS_TIMEZONE}
-    ports:
-      - ${FPM_PORT}:9001
     volumes:
       - ./app:/home/${WEB_USER_NAME}/public_html
       # - ./container-conf/php/php.ini:/usr/local/etc/php/php.ini

@@ -65,6 +65,9 @@ RUN set -eux \
     && sed -i -e "/^http {/a \    server_tokens off;" /etc/nginx/nginx.conf \
     && sed -i -e "/#gzip/s/#//g" /etc/nginx/nginx.conf \
     && sed -i -e "/gzip.*on/a \    server_names_hash_bucket_size 128;" /etc/nginx/nginx.conf \
+    && sed -i -e "/server_names_hash_bucket_size/a \    fastcgi_buffers 16 32k;" /etc/nginx/nginx.conf \
+    && sed -i -e "/fastcgi_buffers/a \    fastcgi_buffer_size 64k;" /etc/nginx/nginx.conf \
+    && sed -i -e "/fastcgi_buffer_size/a \    fastcgi_busy_buffers_size 64k;" /etc/nginx/nginx.conf \
     && sed -i -e "/keepalive_timeout/s/65/5/g" /etc/nginx/nginx.conf \
     && DOCUMENT_ROOT="/home/${WEB_USER_NAME}/public_html" \
     && sed -i -e "1,/root/ s/\/usr\/share\/nginx\/html/${DOCUMENT_ROOT//\//\\/}/g" /etc/nginx/conf.d/default.conf \
