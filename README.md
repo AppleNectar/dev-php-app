@@ -1,7 +1,8 @@
 # Web service development docker stack
 
 Docker container stack for a web service development using PHP.  
-The stack consists of Nginx / php-fpm / MariaDB / Redis, each container is based on Alpine Linux.
+The stack consists of Nginx / php-fpm / MariaDB / Redis, each container is based on Alpine Linux.  
+It is only for local development, do not use it in a server environment (EC2, ECS, etc.).
 
 ## Usage
 
@@ -24,10 +25,10 @@ The stack consists of Nginx / php-fpm / MariaDB / Redis, each container is based
 
 ### PHP
 
-- Use the official image of php (Default version 8.0.0)
+- Use the official image of php (Default version 8.0.3)
 - The execution user has the same username and user id as Nginx.
 - Listen on port 9000 of TCP
-- Xdebug extension is valid (Listen on port 9003 / Default ide key `IDEKEY`)
+- Xdebug extension is valid (Listen on port 9003 / Default ide key `IDEKEY` / Start with request trigger)
 - PHP's extension that Laravel depends on is installed
 - Composer is installed system-wide
 - php-cs-fixer is installed system wide
