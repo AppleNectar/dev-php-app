@@ -1,30 +1,41 @@
 #!/bin/sh
 
 : "MariaDB container entrypoint" && set -eux && {
-    if [ ! -d "${MYSQL_DATA_PATH}/mysql" ]; then
-        # Initialize
-        mysql_install_db --user=mysql --datadir=${MYSQL_DATA_PATH}
-        # Start mariadb
-        rc-service mariadb start
-        # Generate and execute SQL to change root password and create users, delete default user and test database
-        TEMP_SQL=/tmp/maria_init.sql
-        mysqladmin -u root password "${MYSQL_ROOT_PASSWORD}"
-        echo "CREATE DATABASE IF NOT EXISTS ${MYSQL_DEFAULT_DB} DEFAULT CHARACTER SET utf8mb4;" >> ${TEMP_SQL}
-        echo "GRANT ALL PRIVILEGES ON ${MYSQL_DEFAULT_DB}.* TO ${MYSQL_USER}@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION;" >> ${TEMP_SQL}
-        echo "DELETE FROM mysql.user WHERE User='';" >> ${TEMP_SQL}
-        echo "DROP DATABASE test;" >> ${TEMP_SQL}
-        echo "FLUSH PRIVILEGES;" >> ${TEMP_SQL}
-        cat ${TEMP_SQL} | mysql -u root --password="${MYSQL_ROOT_PASSWORD}"
-        rm ${TEMP_SQL}
-        unset TEMP_SQL
-        # Create timezone support tables from zone info
-        mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -D mysql -u root --password="${MYSQL_ROOT_PASSWORD}"
-        rc-service mariadb stop
+    # Create socket dir
+    if [ ! -d "/run/mysqld" ]; then
+        mkdir /run/mysqld
+        chown mysql:mysql /run/mysqld
     else
-        # If don't start it with service once, it won't create a socket file, so start and stop it (you can create it manually, but...)
-        rc-service mariadb start
-        rc-service mariadb stop
+        chown mysql:mysql /run/mysqld
     fi
 
-    mysqld --user=mysql --datadir=${MYSQL_DATA_PATH}
+    # Create data dir
+    if [ ! -d "/var/lib/mysql" ]; then
+        mkdir /var/lib/mysql
+        chown mysql:mysql /var/lib/mysql
+    else
+        chown mysql:mysql /var/lib/mysql
+    fi
+
+    if [ -z "$(ls /var/lib/mysql)" ]; then
+        mysql_install_db --user=mysql --datadir=/var/lib/mysql
+        # Generate and execute SQL to change root password and create users, delete default user and test database
+        INIT_SQL=/tmp/maria_init.sql
+        cat << EOF > ${INIT_SQL}
+USE mysql;
+FLUSH PRIVILEGES;
+GRANT ALL ON *.* TO 'root'@'%' identified by '${MYSQL_ROOT_PASSWORD}' WITH GRANT OPTION;
+GRANT ALL ON *.* TO 'root'@'localhost' identified by '${MYSQL_ROOT_PASSWORD}' WITH GRANT OPTION;
+GRANT ALL ON *.* TO 'root'@'127.0.0.1' identified by '${MYSQL_ROOT_PASSWORD}' WITH GRANT OPTION;
+DROP DATABASE IF EXISTS test;
+CREATE DATABASE IF NOT EXISTS ${MYSQL_DEFAULT_DB} DEFAULT CHARACTER SET utf8mb4;
+GRANT ALL PRIVILEGES ON ${MYSQL_DEFAULT_DB}.* TO ${MYSQL_USER}@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION;
+DELETE FROM mysql.user WHERE User='';
+FLUSH PRIVILEGES;
+EOF
+        /usr/bin/mysqld --user=mysql --bootstrap --verbose=0 --skip-name-resolve --skip-networking=0 < ${INIT_SQL}
+        rm -f ${INIT_SQL}
+    fi
+
+    exec /usr/bin/mysqld --user=mysql --port=3306 --character-set-server=utf8mb4 --skip-name-resolve --skip-bind-address --skip-networking=0 $@
 }
