@@ -29,6 +29,7 @@ services:
     build:
       context: ./build/php
       args:
+        CONTAINERS_TIMEZONE: ${CONTAINERS_TIMEZONE}
         PHP_VERSION: ${PHP_VERSION}
         WEB_USER_NAME: ${WEB_USER_NAME}
         WEB_USER_GROUP: ${WEB_USER_GROUP}
@@ -45,12 +46,11 @@ services:
       # - ./container-conf/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
       # - ./container-conf/php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-  mysql.local:
+  maria.local:
     build:
       context: ./build/maria
     environment:
       TZ: ${CONTAINERS_TIMEZONE}
-      MYSQL_DATA_PATH: ${MYSQL_DATA_PATH}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
@@ -58,7 +58,7 @@ services:
     ports:
       - ${DB_PORT}:3306
     volumes:
-      - mysql-data:${MYSQL_DATA_PATH}
+      - mysql-data:/var/lib/mysql
       # - ./container-conf/maria/my.cnf.d/mariadb-server.cnf:/etc/my.cnf.d/mariadb-server.cnf
 
   redis.local:
