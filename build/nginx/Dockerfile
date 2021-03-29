@@ -1,5 +1,4 @@
 FROM nginx:1.18.0-alpine
-LABEL maintainer="AppleNectar"
 
 ARG WEB_USER_NAME
 ARG WEB_USER_GROUP

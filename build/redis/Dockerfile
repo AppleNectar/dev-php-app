@@ -1,5 +1,4 @@
 FROM redis:6-alpine
-LABEL maintainer="AppleNectar"
 
 RUN set -eux \
   && apk update \
