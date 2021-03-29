@@ -1,8 +1,8 @@
 ARG PHP_VERSION
 
 FROM php:${PHP_VERSION}-fpm-alpine3.12
-LABEL maintainer="AppleNectar"
 
+ARG CONTAINERS_TIMEZONE
 ARG WEB_USER_NAME
 ARG WEB_USER_GROUP
 ARG WEB_USER_UID
@@ -55,13 +55,14 @@ RUN set -eux \
 # Create configs
 RUN set -eux \
     && cp -i /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
+    && sed -i -e "s|;date.timezone =|date.timezone = ${CONTAINERS_TIMEZONE}|g" /usr/local/etc/php/php.ini \
+    && sed -i -e "/^user = /s/user/;user/g" /usr/local/etc/php-fpm.d/www.conf \
+    && sed -i -e "/^group = /s/group/;group/g" /usr/local/etc/php-fpm.d/www.conf \
     && cp -i /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php-fpm.d/zzz-www.conf \
-    && sed -i -e "/^user = /s/www-data/${WEB_USER_NAME}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
-    && sed -i -e "/^group = /s/www-data/${WEB_USER_GROUP}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
-    #&& sed -i -e "/^listen = /s/127.0.0.1:9000/\/var\/run\/php-fpm\/php-fpm.sock/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
+    && sed -i -e "/^user = /s/user/;user/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
+    && sed -i -e "/^group = /s/group/;group/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
     && sed -i -e "/^listen = /s/127.0.0.1:9000/9000/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
-    && sed -i -e "s/;listen.owner = www-data/listen.owner = ${WEB_USER_NAME}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
-    && sed -i -e "s/;listen.owner = www-data/listen.group = ${WEB_USER_GROUP}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
+    && sed -i -e "s/;listen.group = www-data/listen.group = ${WEB_USER_GROUP}/g" /usr/local/etc/php-fpm.d/zzz-www.conf \
     && sed -i -e "s/;listen.mode/listen.mode/g" /usr/local/etc/php-fpm.d/zzz-www.conf
 
 # Install php libraries
@@ -85,7 +86,7 @@ RUN set -eux \
 
 # Install php-cs-fixer
 RUN set -eux \
-    && wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.16.1/php-cs-fixer.phar -O php-cs-fixer \
+    && wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.17.3/php-cs-fixer.phar -O php-cs-fixer \
     && chmod a+x php-cs-fixer \
     && mv php-cs-fixer /usr/local/bin/php-cs-fixer
 
